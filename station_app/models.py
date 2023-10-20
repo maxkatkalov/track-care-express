@@ -62,6 +62,7 @@ class Journey(models.Model):
     )
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
+    crew = models.ManyToManyField(Crew, related_name="journeys")
 
     def __str__(self) -> str:
         return (
