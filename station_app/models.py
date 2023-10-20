@@ -23,12 +23,40 @@ class Route(models.Model):
         return f"Route: {self.source} - {self.destination}: {self.distance}"
 
 
+class Train(models.Model):
+    name = models.CharField(max_length=100)
+    carriage_num = models.IntegerField()
+    places_in_carriage = models.IntegerField()
+    train_type = models.ForeignKey(
+        "TrainType", on_delete=models.CASCADE, related_name="trains"
+    )
+
+    def __str__(self) -> str:
+        return f"Train: {self.name}, type: {self.train_type}"
+
+
+class TrainType(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Crew(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    staff_member_since = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"Crew member: {self.first_name} {self.last_name}"
+
+
 class Journey(models.Model):
     route = models.ForeignKey(
         Route, on_delete=models.CASCADE, related_name="journeys"
     )
     train = models.ForeignKey(
-        "Train", on_delete=models.CASCADE, related_name="journeys"
+        Train, on_delete=models.CASCADE, related_name="journeys"
     )
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
