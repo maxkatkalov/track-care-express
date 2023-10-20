@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 
 class Station(models.Model):
@@ -89,5 +90,51 @@ class Ticket(models.Model):
         Journey, on_delete=models.CASCADE, related_name="tickets"
     )
 
+    @staticmethod
+    def validate_ticket(carriage, seat, train, error_to_raise):
+        if not 1 <= carriage <= train.carriage_num:
+            raise error_to_raise(
+                {
+                    "carriage": [
+                        f"carriage number must be in available range: (1, carriage): "
+                        f"(1, {train.carriage_num})"
+                    ]
+                }
+            )
+        elif not 1 <= seat <= train.places_in_carriage:
+            raise error_to_raise(
+                {
+                    "seat": [
+                        f"seat number must be in available range: "
+                        f"(1, seats_in_row): "
+                        f"(1, {train.places_in_carriage})"
+                    ]
+                }
+            )
+
+    def clean(self):
+        Ticket.validate_ticket(
+            self.carriage,
+            self.seat,
+            self.journey.train.carriage_num,
+            ValidationError,
+        )
+
+    def save(
+            self,
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None,
+    ):
+        self.full_clean()
+        return super().save(
+            force_insert, force_update, using, update_fields
+        )
+
     def __str__(self) -> str:
         return f"Ticket: {self.order} - {self.journey}"
+
+    class Meta:
+        unique_together = ("movie_session", "row", "seat")
+        ordering = ["carriage", "seat"]
