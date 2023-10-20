@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class Station(models.Model):
@@ -66,3 +67,27 @@ class Journey(models.Model):
             f"Journey: {self.route} - {self.train}: "
             f"{self.departure_time} - {self.arrival_time}"
         )
+
+
+class Order(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders"
+    )
+
+    def __str__(self) -> str:
+        return f"Order: {self.created_at}"
+
+
+class Ticket(models.Model):
+    carriage = models.IntegerField()
+    seat = models.IntegerField()
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="tickets"
+    )
+    journey = models.ForeignKey(
+        Journey, on_delete=models.CASCADE, related_name="tickets"
+    )
+
+    def __str__(self) -> str:
+        return f"Ticket: {self.order} - {self.journey}"
