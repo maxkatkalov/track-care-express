@@ -14,10 +14,10 @@ class Station(models.Model):
 
 class Route(models.Model):
     source = models.ForeignKey(
-        Station, on_delete=models.CASCADE, related_name="routes"
+        Station, on_delete=models.CASCADE, related_name="source_rout_station"
     )
     destination = models.ForeignKey(
-        Station, on_delete=models.CASCADE, related_name="routes"
+        Station, on_delete=models.CASCADE, related_name="destination_rout_station"
     )
     distance = models.FloatField()
 
@@ -136,5 +136,5 @@ class Ticket(models.Model):
         return f"Ticket: {self.order} - {self.journey}"
 
     class Meta:
-        unique_together = ("movie_session", "row", "seat")
+        unique_together = ("carriage", "carriage", "seat")
         ordering = ["carriage", "seat"]
