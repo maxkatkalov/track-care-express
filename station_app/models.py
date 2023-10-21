@@ -45,14 +45,10 @@ class Route(models.Model):
         Route.validate_route(self.source, self.destination, ValidationError)
 
     def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
+        self, *args, **kwargs
     ):
         self.full_clean()
-        return super().save(force_insert, force_update, using, update_fields)
+        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"Route: {self.source.name} " f"- {self.destination.name}."
