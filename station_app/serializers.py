@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db import transaction
 
 from .models import (
     Station,
@@ -153,7 +154,9 @@ class OrderField(serializers.PrimaryKeyRelatedField):
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    order = OrderField(queryset=Order.objects.all())
+    class Meta:
+        model = Ticket
+        fields = ("id", "carriage", "seat", "journey")
 
     def validate(self, attrs):
         data = super().validate(attrs=attrs)
@@ -165,12 +168,18 @@ class TicketSerializer(serializers.ModelSerializer):
         )
         return data
 
-    class Meta:
-        model = Ticket
-        fields = ("id", "carriage", "seat", "order", "journey")
-
 
 class OrderSerializer(serializers.ModelSerializer):
+    tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
+
     class Meta:
         model = Order
-        fields = ("id", "created_at")
+        fields = ("id", "created_at", "tickets")
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            tickets_data = validated_data.pop("tickets")
+            order = Order.objects.create(**validated_data)
+            for ticket_data in tickets_data:
+                Ticket.objects.create(order=order, **ticket_data)
+            return order
