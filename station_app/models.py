@@ -17,7 +17,9 @@ class Route(models.Model):
         Station, on_delete=models.CASCADE, related_name="source_rout_station"
     )
     destination = models.ForeignKey(
-        Station, on_delete=models.CASCADE, related_name="destination_rout_station"
+        Station,
+        on_delete=models.CASCADE,
+        related_name="destination_rout_station",
     )
     distance = models.FloatField()
 
@@ -74,7 +76,9 @@ class Journey(models.Model):
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="orders",
     )
 
     def __str__(self) -> str:
@@ -97,7 +101,8 @@ class Ticket(models.Model):
             raise error_to_raise(
                 {
                     "carriage": [
-                        f"carriage number must be in available range: (1, carriage): "
+                        f"carriage number must be in available "
+                        f"range: (1, carriage): "
                         f"(1, {train.carriage_num})"
                     ]
                 }
@@ -122,16 +127,14 @@ class Ticket(models.Model):
         )
 
     def save(
-            self,
-            force_insert=False,
-            force_update=False,
-            using=None,
-            update_fields=None,
+        self,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
     ):
         self.full_clean()
-        return super().save(
-            force_insert, force_update, using, update_fields
-        )
+        return super().save(force_insert, force_update, using, update_fields)
 
     def __str__(self) -> str:
         return f"Ticket: {self.order} - {self.journey}"
