@@ -111,6 +111,15 @@ class TrainTypeSerializer(serializers.ModelSerializer):
 
 
 class JourneySerializer(serializers.ModelSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs=attrs)
+        Journey.validate_journey_date_times_fields(
+            data["departure_time"],
+            data["arrival_time"],
+            serializers.ValidationError,
+        )
+        return data
+
     class Meta:
         model = Journey
         fields = ("id", "route", "train", "departure_time", "arrival_time", "crew")

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
 class Station(models.Model):
@@ -103,6 +104,42 @@ class Journey(models.Model):
     arrival_time = models.DateTimeField()
     crew = models.ManyToManyField(Crew, related_name="journeys")
 
+    @staticmethod
+    def validate_journey_date_times_fields(
+            departure_time: datetime,
+            arrival_time: datetime,
+            error_to_raise: ValidationError
+    ) -> None:
+        if departure_time >= arrival_time:
+            raise error_to_raise(
+                {
+                    "source_datetime": [
+                        "source_datetime cannot be later than or equal to arrival_time"
+                    ]
+                }
+            )
+        if departure_time < timezone.now():
+            raise error_to_raise(
+                {
+                    "departure_time": [
+                        f"departure_time cannot be in the past it should be after {datetime.now().strftime('%Y-%m-%d, %H:%M')}"
+                    ]
+                }
+            )
+
+    def clean(self):
+        Journey.validate_journey_date_times_fields(
+            departure_time=self.departure_time,
+            arrival_time=self.arrival_time,
+            error_to_raise=ValidationError
+        )
+
+    def save(
+        self, *args, **kwargs
+    ):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
     def __str__(self) -> str:
         return (
             f"Journey: {self.route} - {self.train}: "
@@ -164,14 +201,10 @@ class Ticket(models.Model):
         )
 
     def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
+        self, *args, **kwargs
     ):
         self.full_clean()
-        return super().save(force_insert, force_update, using, update_fields)
+        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"Ticket: {self.order} - {self.journey}"
