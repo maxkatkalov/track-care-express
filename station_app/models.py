@@ -42,27 +42,20 @@ class Route(models.Model):
             )
 
     def clean(self):
-        Route.validate_route(
-            self.source,
-            self.destination,
-            ValidationError
-        )
+        Route.validate_route(self.source, self.destination, ValidationError)
 
     def save(
-            self,
-            force_insert=False,
-            force_update=False,
-            using=None,
-            update_fields=None,
+        self,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
     ):
         self.full_clean()
         return super().save(force_insert, force_update, using, update_fields)
 
     def __str__(self) -> str:
-        return (
-            f"Route: {self.source.name} "
-            f"- {self.destination.name}."
-        )
+        return f"Route: {self.source.name} " f"- {self.destination.name}."
 
 
 class Train(models.Model):
@@ -106,9 +99,9 @@ class Journey(models.Model):
 
     @staticmethod
     def validate_journey_date_times_fields(
-            departure_time: datetime,
-            arrival_time: datetime,
-            error_to_raise: ValidationError
+        departure_time: datetime,
+        arrival_time: datetime,
+        error_to_raise: ValidationError,
     ) -> None:
         if departure_time >= arrival_time:
             raise error_to_raise(
@@ -131,12 +124,10 @@ class Journey(models.Model):
         Journey.validate_journey_date_times_fields(
             departure_time=self.departure_time,
             arrival_time=self.arrival_time,
-            error_to_raise=ValidationError
+            error_to_raise=ValidationError,
         )
 
-    def save(
-        self, *args, **kwargs
-    ):
+    def save(self, *args, **kwargs):
         self.full_clean()
         return super().save(*args, **kwargs)
 
@@ -176,8 +167,7 @@ class Ticket(models.Model):
                 {
                     "carriage": [
                         f"carriage number must be in available "
-                        f"range: (1, carriage): "
-                        f"(1, {train.carriage_num})"
+                        f"range: (1, {train.carriage_num})"
                     ]
                 }
             )
@@ -186,7 +176,6 @@ class Ticket(models.Model):
                 {
                     "seat": [
                         f"seat number must be in available range: "
-                        f"(1, seats_in_row): "
                         f"(1, {train.places_in_carriage})"
                     ]
                 }
@@ -196,13 +185,11 @@ class Ticket(models.Model):
         Ticket.validate_ticket(
             self.carriage,
             self.seat,
-            self.journey.train.carriage_num,
+            self.journey.train,
             ValidationError,
         )
 
-    def save(
-        self, *args, **kwargs
-    ):
+    def save(self, *args, **kwargs):
         self.full_clean()
         return super().save(*args, **kwargs)
 
