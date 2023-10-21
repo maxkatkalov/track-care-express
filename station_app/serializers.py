@@ -108,3 +108,25 @@ class TrainTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrainType
         fields = ("id", "name")
+
+
+class JourneySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Journey
+        fields = ("id", "route", "train", "departure_time", "arrival_time", "crew")
+
+
+class JourneyListSerializer(JourneySerializer):
+    route_link = serializers.HyperlinkedRelatedField(
+        source="route",
+        view_name="routes-detail",
+        read_only=True
+    )
+    train_link = serializers.HyperlinkedRelatedField(
+        source="train",
+        view_name="trains-detail",
+        read_only=True
+    )
+
+    class Meta(JourneySerializer.Meta):
+        fields = JourneySerializer.Meta.fields + ("route_link", "train_link")
