@@ -5,7 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("station_app", "0004_route_destination_datetime_route_source_datetime"),
+        (
+            "station_app",
+            "0004_route_destination_datetime_route_source_datetime",
+        ),
     ]
 
     operations = [
