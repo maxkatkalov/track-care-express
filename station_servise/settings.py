@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "django_extensions",
     "station_app.apps.StationAppConfig",
     "station_user.apps.StationUserConfig",
 ]
