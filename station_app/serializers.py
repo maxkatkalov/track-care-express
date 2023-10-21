@@ -7,6 +7,7 @@ from .models import (
     TrainType,
     Crew,
     Journey,
+    Order,
 )
 
 
@@ -139,3 +140,9 @@ class JourneyListSerializer(JourneySerializer):
 
     class Meta(JourneySerializer.Meta):
         fields = JourneySerializer.Meta.fields + ("route_link", "train_link")
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ("id", "created_at")
