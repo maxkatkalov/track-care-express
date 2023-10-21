@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -21,10 +23,61 @@ class Route(models.Model):
         on_delete=models.CASCADE,
         related_name="destination_rout_station",
     )
+    source_datetime = models.DateTimeField(default=datetime.now)
+    destination_datetime = models.DateTimeField(
+        default=(datetime.now() + timedelta(days=1))
+    )
     distance = models.FloatField()
 
+    @staticmethod
+    def validate_route(
+        source,
+        destination,
+        source_datetime,
+        destination_datetime,
+        error_to_raise=ValidationError,
+    ):
+        if source == destination:
+            raise error_to_raise(
+                {
+                    "source": [
+                        "source and destination cannot be the same station"
+                    ]
+                }
+            )
+        elif source_datetime >= destination_datetime:
+            raise error_to_raise(
+                {
+                    "source_datetime": [
+                        "source_datetime cannot be later than or equal to destination_datetime"
+                    ]
+                }
+            )
+
+    def clean(self):
+        Route.validate_route(
+            self.source,
+            self.destination,
+            self.source_datetime,
+            self.destination_datetime,
+            ValidationError
+        )
+
+    def save(
+            self,
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None,
+    ):
+        self.full_clean()
+        return super().save(force_insert, force_update, using, update_fields)
+
     def __str__(self) -> str:
-        return f"Route: {self.source} - {self.destination}: {self.distance}"
+        return (
+            f"Route: {self.source.name} {self.source_datetime.strftime('%Y-%m-%d, %H:%M')} "
+            f"- {self.destination.name}: {self.source_datetime.strftime('%Y-%m-%d, %H:%M')}"
+        )
 
 
 class Train(models.Model):
