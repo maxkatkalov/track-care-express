@@ -83,6 +83,21 @@ class TrainSerializer(serializers.ModelSerializer):
         )
 
 
+class TrainListSerializer(TrainSerializer):
+    train_type = serializers.StringRelatedField()
+
+
+class TrainDetailSerializer(TrainListSerializer):
+    train_type_link = serializers.HyperlinkedRelatedField(
+        source="train_type",
+        view_name="trains-type-detail",
+        read_only=True
+    )
+
+    class Meta(TrainSerializer.Meta):
+        fields = TrainSerializer.Meta.fields + ("train_type_link",)
+
+
 class TrainTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrainType
