@@ -183,3 +183,16 @@ class OrderSerializer(serializers.ModelSerializer):
             for ticket_data in tickets_data:
                 Ticket.objects.create(order=order, **ticket_data)
             return order
+
+
+class OrderListSerializer(serializers.ModelSerializer):
+    tickets = serializers.HyperlinkedRelatedField(
+        many=True,
+        view_name="tickets-detail",
+        read_only=True
+    )
+    total_tickets = serializers.IntegerField()
+
+    class Meta:
+        model = Order
+        fields = OrderSerializer.Meta.fields + ("total_tickets", )
