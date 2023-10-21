@@ -5,6 +5,7 @@ from .models import (
     Route,
     Train,
     TrainType,
+    Crew,
 )
 
 
@@ -68,6 +69,14 @@ class RouteSerializer(serializers.ModelSerializer):
             "source_datetime",
             "destination_datetime",
         )
+
+
+class CrewSerializer(serializers.ModelSerializer):
+    staff_member_since = serializers.DateField(read_only=True)
+
+    class Meta:
+        model = Crew
+        fields = ("id", "first_name", "last_name", "staff_member_since")
 
 
 class TrainSerializer(serializers.ModelSerializer):
