@@ -8,6 +8,7 @@ from .models import (
     Crew,
     Journey,
     Order,
+    Ticket,
 )
 
 
@@ -86,7 +87,7 @@ class TrainSerializer(serializers.ModelSerializer):
             "train_type",
             "carriage_num",
             "places_in_carriage",
-            "train_type"
+            "train_type",
         )
 
 
@@ -96,9 +97,7 @@ class TrainListSerializer(TrainSerializer):
 
 class TrainDetailSerializer(TrainListSerializer):
     train_type_link = serializers.HyperlinkedRelatedField(
-        source="train_type",
-        view_name="trains-type-detail",
-        read_only=True
+        source="train_type", view_name="trains-type-detail", read_only=True
     )
 
     class Meta(TrainSerializer.Meta):
@@ -123,23 +122,52 @@ class JourneySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Journey
-        fields = ("id", "route", "train", "departure_time", "arrival_time", "crew")
+        fields = (
+            "id",
+            "route",
+            "train",
+            "departure_time",
+            "arrival_time",
+            "crew",
+        )
 
 
 class JourneyListSerializer(JourneySerializer):
     route_link = serializers.HyperlinkedRelatedField(
-        source="route",
-        view_name="routes-detail",
-        read_only=True
+        source="route", view_name="routes-detail", read_only=True
     )
     train_link = serializers.HyperlinkedRelatedField(
-        source="train",
-        view_name="trains-detail",
-        read_only=True
+        source="train", view_name="trains-detail", read_only=True
     )
 
     class Meta(JourneySerializer.Meta):
         fields = JourneySerializer.Meta.fields + ("route_link", "train_link")
+
+
+class OrderField(serializers.PrimaryKeyRelatedField):
+    """To show only request.user orders on TicketSerializer order field"""
+
+    def get_queryset(self):
+        user = self.context["request"].user
+        return Order.objects.filter(user=user)
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    order = OrderField(queryset=Order.objects.all())
+
+    def validate(self, attrs):
+        data = super().validate(attrs=attrs)
+        Ticket.validate_ticket(
+            data["carriage"],
+            data["seat"],
+            data.get("journey").train,
+            serializers.ValidationError,
+        )
+        return data
+
+    class Meta:
+        model = Ticket
+        fields = ("id", "carriage", "seat", "order", "journey")
 
 
 class OrderSerializer(serializers.ModelSerializer):

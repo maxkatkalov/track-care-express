@@ -1,6 +1,15 @@
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Station, Route, Train, TrainType, Crew, Journey, Order
+from .models import (
+    Station,
+    Route,
+    Train,
+    TrainType,
+    Crew,
+    Journey,
+    Order,
+    Ticket,
+)
 from .serializers import (
     StationSerializer,
     StationDetailSerializer,
@@ -12,7 +21,8 @@ from .serializers import (
     CrewSerializer,
     JourneySerializer,
     JourneyListSerializer,
-    OrderSerializer
+    OrderSerializer,
+    TicketSerializer,
 )
 
 
@@ -70,3 +80,8 @@ class OrderViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class TicketViewSet(ModelViewSet):
+    queryset = Ticket.objects.all()
+    serializer_class = TicketSerializer
