@@ -6,6 +6,7 @@ from .models import (
     Train,
     TrainType,
     Crew,
+    Journey,
 )
 
 
@@ -16,8 +17,8 @@ class StationSerializer(serializers.ModelSerializer):
 
 
 class StationDetailSerializer(serializers.ModelSerializer):
-    five_departing_source_for = serializers.SerializerMethodField()
-    five_incoming_destination_for = serializers.SerializerMethodField()
+    # five_departing_source_for = serializers.SerializerMethodField()
+    # five_incoming_destination_for = serializers.SerializerMethodField()
 
     @staticmethod
     def get_five_departing_source_for(obj):
@@ -42,8 +43,8 @@ class StationDetailSerializer(serializers.ModelSerializer):
             "name",
             "latitude",
             "longitude",
-            "five_departing_source_for",
-            "five_incoming_destination_for",
+            # "five_departing_source_for",
+            # "five_incoming_destination_for",
         )
 
 
@@ -53,8 +54,6 @@ class RouteSerializer(serializers.ModelSerializer):
         Route.validate_route(
             data["source"],
             data["destination"],
-            data.get("source_datetime"),
-            data.get("destination_datetime"),
             serializers.ValidationError,
         )
         return data
@@ -66,8 +65,6 @@ class RouteSerializer(serializers.ModelSerializer):
             "source",
             "destination",
             "distance",
-            "source_datetime",
-            "destination_datetime",
         )
 
 

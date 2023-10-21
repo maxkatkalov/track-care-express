@@ -23,18 +23,12 @@ class Route(models.Model):
         on_delete=models.CASCADE,
         related_name="destination_rout_station",
     )
-    source_datetime = models.DateTimeField(default=datetime.now)
-    destination_datetime = models.DateTimeField(
-        default=(datetime.now() + timedelta(days=1))
-    )
     distance = models.FloatField()
 
     @staticmethod
     def validate_route(
         source,
         destination,
-        source_datetime,
-        destination_datetime,
         error_to_raise=ValidationError,
     ):
         if source == destination:
@@ -45,21 +39,11 @@ class Route(models.Model):
                     ]
                 }
             )
-        elif source_datetime >= destination_datetime:
-            raise error_to_raise(
-                {
-                    "source_datetime": [
-                        "source_datetime cannot be later than or equal to destination_datetime"
-                    ]
-                }
-            )
 
     def clean(self):
         Route.validate_route(
             self.source,
             self.destination,
-            self.source_datetime,
-            self.destination_datetime,
             ValidationError
         )
 
@@ -75,8 +59,8 @@ class Route(models.Model):
 
     def __str__(self) -> str:
         return (
-            f"Route: {self.source.name} {self.source_datetime.strftime('%Y-%m-%d, %H:%M')} "
-            f"- {self.destination.name}: {self.source_datetime.strftime('%Y-%m-%d, %H:%M')}"
+            f"Route: {self.source.name} "
+            f"- {self.destination.name}."
         )
 
 
