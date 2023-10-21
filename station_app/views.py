@@ -1,4 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
+from django.db.models import Count
 
 from .models import (
     Station,
@@ -23,6 +24,8 @@ from .serializers import (
     JourneyListSerializer,
     OrderSerializer,
     TicketSerializer,
+    OrderListSerializer,
+    OrderDetailSerializer,
 )
 
 
@@ -75,8 +78,17 @@ class JourneyViewSet(ModelViewSet):
 
 
 class OrderViewSet(ModelViewSet):
-    queryset = Order.objects.all()
+    queryset = Order.objects.annotate(
+        total_tickets=Count("tickets")
+    )
     serializer_class = OrderSerializer
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return OrderListSerializer
+        if self.action == "retrieve":
+            return OrderDetailSerializer
+        return self.serializer_class
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
