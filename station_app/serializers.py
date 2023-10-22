@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.db import transaction
 
+
 from .models import (
     Station,
     Route,
@@ -175,6 +176,29 @@ class OrderSerializer(serializers.ModelSerializer):
             for ticket_data in tickets_data:
                 Ticket.objects.create(order=order, **ticket_data)
             return order
+
+    def update(self, instance, validated_data):
+        with transaction.atomic():
+            instance.created_at = validated_data.get("created_at", instance.created_at)
+            instance.save()
+
+            tickets_data = validated_data.get("tickets", [])
+            ticket_ids = [ticket.get('id') for ticket in tickets_data]
+
+            tickets_to_delete = instance.tickets.exclude(id__in=ticket_ids)
+            tickets_to_delete.delete()
+
+            for ticket_data in tickets_data:
+                ticket_id = ticket_data.get('id')
+                if ticket_id:
+                    ticket = instance.tickets.filter(id=ticket_id).first()
+                    if ticket:
+                        ticket.some_field = ticket_data.get('some_field')
+                        ticket.save()
+                else:
+                    Ticket.objects.create(order=instance, **ticket_data)
+
+        return instance
 
 
 class JourneySerializer(serializers.ModelSerializer):
