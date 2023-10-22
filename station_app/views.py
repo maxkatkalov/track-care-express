@@ -3,6 +3,8 @@ from datetime import datetime
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count, F
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from .models import (
     Station,
@@ -104,6 +106,32 @@ class JourneyViewSet(ModelViewSet):
         if self.action == "retrieve":
             return JoureyDetailSerializer
         return JourneySerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "source",
+                type=OpenApiTypes.STR,
+                description="Filter by source station name (ex. ?source=Lviv)",
+            ),
+            OpenApiParameter(
+                "destination",
+                type=OpenApiTypes.STR,
+                description=(
+                        "Filter by destination station name (ex. ?destination=Lviv)"
+                ),
+            ),
+            OpenApiParameter(
+                "departure-date",
+                type=OpenApiTypes.DATE,
+                description=(
+                        "Filter by departure-date (ex. ?departure-date=2023-10-21)"
+                ),
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class OrderViewSet(ModelViewSet):
