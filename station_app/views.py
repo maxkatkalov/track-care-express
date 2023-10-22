@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -176,7 +177,13 @@ class JourneyViewSet(ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
-class OrderViewSet(ModelViewSet):
+class OrderViewSet(
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
+    GenericViewSet,
+):
     queryset = Order.objects.prefetch_related("tickets").annotate(
         total_tickets=Count("tickets")
     )
@@ -197,6 +204,13 @@ class OrderViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class TicketViewSet(ModelViewSet):
+class TicketViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    GenericViewSet,
+):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    permission_classes = (IsAuthenticated,)

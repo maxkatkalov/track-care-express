@@ -35,7 +35,7 @@ class Route(models.Model):
         destination,
         error_to_raise=ValidationError,
     ):
-        if source == destination:
+        if source == destination or destination == source:
             raise error_to_raise(
                 {
                     "source": [
