@@ -1,4 +1,7 @@
-from datetime import datetime, timedelta
+import uuid
+from datetime import datetime
+import os
+from django.utils.text import slugify
 
 from django.db import models
 from django.conf import settings
@@ -73,10 +76,18 @@ class TrainType(models.Model):
         return self.name
 
 
+def crew_image_file_path(instance, filename):
+    _, extension = os.path.splitext(filename)
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+
+    return os.path.join("uploads/crew/", filename)
+
+
 class Crew(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     staff_member_since = models.DateField(auto_now_add=True)
+    profile_image = models.ImageField(null=True, upload_to=crew_image_file_path)
 
     def __str__(self) -> str:
         return f"Crew member: {self.first_name} {self.last_name}"
