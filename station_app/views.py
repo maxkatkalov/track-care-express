@@ -1,7 +1,10 @@
 from datetime import datetime
 
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
 from django.db.models import Count, F
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -25,6 +28,7 @@ from .serializers import (
     TrainDetailSerializer,
     TrainListSerializer,
     CrewSerializer,
+    CrewImageSerializer,
     JourneySerializer,
     JourneyListSerializer,
     JoureyDetailSerializer,
@@ -57,6 +61,28 @@ class CrewViewSet(ModelViewSet):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+    def get_serializer_class(self):
+        if self.action == "upload_image":
+            return CrewImageSerializer
+        return self.serializer_class
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+        permission_classes=[IsAdminUser],
+    )
+    def upload_image(self, request, pk=None):
+        """Endpoint for uploading image to specific crew member"""
+        crew_member = self.get_object()
+        serializer = self.get_serializer(crew_member, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TrainViewSet(ModelViewSet):
