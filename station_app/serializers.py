@@ -196,3 +196,17 @@ class OrderListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = OrderSerializer.Meta.fields + ("total_tickets", )
+
+
+class OrderDetailSerializer(OrderListSerializer):
+    tickets = TicketSerializer(many=True, read_only=True)
+    tickets_link = serializers.HyperlinkedRelatedField(
+        source="tickets",
+        many=True,
+        read_only=True,
+        view_name="tickets-detail"
+    )
+
+    class Meta:
+        model = Order
+        fields = OrderListSerializer.Meta.fields + ("tickets_link", )
