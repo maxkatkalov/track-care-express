@@ -189,9 +189,24 @@ class JourneyListSerializer(JourneySerializer):
     train_link = serializers.HyperlinkedRelatedField(
         source="train", view_name="trains-detail", read_only=True
     )
+    source = serializers.SlugRelatedField(
+        source="route.source",
+        read_only=True,
+        slug_field="name"
+    )
+    destination = serializers.SlugRelatedField(
+        source="route.destination",
+        read_only=True,
+        slug_field="name"
+    )
 
     class Meta(JourneySerializer.Meta):
-        fields = JourneySerializer.Meta.fields + ("route_link", "train_link")
+        fields = JourneySerializer.Meta.fields + (
+            "route_link",
+            "train_link",
+            "source",
+            "destination",
+        )
 
 
 class JoureyDetailSerializer(JourneyListSerializer):
