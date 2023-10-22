@@ -94,7 +94,7 @@ class Crew(models.Model):
         return str(self)
 
     def __str__(self) -> str:
-        return f"Crew member: {self.first_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name}"
 
 
 class Journey(models.Model):

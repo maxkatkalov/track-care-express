@@ -29,6 +29,7 @@ from .serializers import (
     TrainListSerializer,
     CrewSerializer,
     CrewImageSerializer,
+    CrewDetailSerializer,
     JourneySerializer,
     JourneyListSerializer,
     JoureyDetailSerializer,
@@ -65,6 +66,8 @@ class CrewViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == "upload_image":
             return CrewImageSerializer
+        if self.action == "retrieve":
+            return CrewDetailSerializer
         return self.serializer_class
 
     @action(

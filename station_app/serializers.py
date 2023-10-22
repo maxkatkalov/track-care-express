@@ -72,11 +72,15 @@ class RouteSerializer(serializers.ModelSerializer):
 
 
 class CrewSerializer(serializers.ModelSerializer):
-    staff_member_since = serializers.DateField(read_only=True)
-
     class Meta:
         model = Crew
-        fields = ("id", "first_name", "last_name", "staff_member_since", "profile_image")
+        fields = ("id", "first_name", "last_name")
+
+
+class CrewDetailSerializer(CrewSerializer):
+    class Meta:
+        model = Crew
+        fields = ("id", "full_name", "profile_image", "staff_member_since")
 
 
 class CrewImageSerializer(serializers.ModelSerializer):
