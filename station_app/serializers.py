@@ -112,6 +112,8 @@ class TrainTypeSerializer(serializers.ModelSerializer):
 
 
 class JourneySerializer(serializers.ModelSerializer):
+    tickets_available = serializers.IntegerField(read_only=True)
+
     def validate(self, attrs):
         data = super().validate(attrs=attrs)
         Journey.validate_journey_date_times_fields(
@@ -130,6 +132,7 @@ class JourneySerializer(serializers.ModelSerializer):
             "departure_time",
             "arrival_time",
             "crew",
+            "tickets_available",
         )
 
 

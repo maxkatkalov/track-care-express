@@ -1,5 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
-from django.db.models import Count
+from django.db.models import Count, F
 
 from .models import (
     Station,
@@ -68,7 +68,12 @@ class TrainTypeViewSet(ModelViewSet):
 
 
 class JourneyViewSet(ModelViewSet):
-    queryset = Journey.objects.all()
+    queryset = Journey.objects.annotate(
+            tickets_available=(
+                F("train__carriage_num") * F("train__places_in_carriage")
+                - Count("tickets")
+            )
+        )
     serializer_class = JourneySerializer
 
     def get_serializer_class(self):
