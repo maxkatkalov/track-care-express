@@ -22,6 +22,7 @@ from .serializers import (
     CrewSerializer,
     JourneySerializer,
     JourneyListSerializer,
+    JoureyDetailSerializer,
     OrderSerializer,
     TicketSerializer,
     OrderListSerializer,
@@ -79,6 +80,8 @@ class JourneyViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return JourneyListSerializer
+        if self.action == "retrieve":
+            return JoureyDetailSerializer
         return JourneySerializer
 
 

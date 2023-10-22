@@ -111,6 +111,52 @@ class TrainTypeSerializer(serializers.ModelSerializer):
         fields = ("id", "name")
 
 
+class OrderField(serializers.PrimaryKeyRelatedField):
+    """To show only request.user orders on TicketSerializer order field"""
+
+    def get_queryset(self):
+        user = self.context["request"].user
+        return Order.objects.filter(user=user)
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = ("id", "carriage", "seat", "journey")
+
+    def validate(self, attrs):
+        data = super().validate(attrs=attrs)
+        Ticket.validate_ticket(
+            data["carriage"],
+            data["seat"],
+            data.get("journey").train,
+            serializers.ValidationError,
+        )
+        return data
+
+
+class TicketSeatsSerializer(TicketSerializer):
+    class Meta:
+        model = Ticket
+        fields = ("carriage", "seat")
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
+
+    class Meta:
+        model = Order
+        fields = ("id", "created_at", "tickets")
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            tickets_data = validated_data.pop("tickets")
+            order = Order.objects.create(**validated_data)
+            for ticket_data in tickets_data:
+                Ticket.objects.create(order=order, **ticket_data)
+            return order
+
+
 class JourneySerializer(serializers.ModelSerializer):
     tickets_available = serializers.IntegerField(read_only=True)
 
@@ -148,44 +194,12 @@ class JourneyListSerializer(JourneySerializer):
         fields = JourneySerializer.Meta.fields + ("route_link", "train_link")
 
 
-class OrderField(serializers.PrimaryKeyRelatedField):
-    """To show only request.user orders on TicketSerializer order field"""
-
-    def get_queryset(self):
-        user = self.context["request"].user
-        return Order.objects.filter(user=user)
-
-
-class TicketSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Ticket
-        fields = ("id", "carriage", "seat", "journey")
-
-    def validate(self, attrs):
-        data = super().validate(attrs=attrs)
-        Ticket.validate_ticket(
-            data["carriage"],
-            data["seat"],
-            data.get("journey").train,
-            serializers.ValidationError,
-        )
-        return data
-
-
-class OrderSerializer(serializers.ModelSerializer):
-    tickets = TicketSerializer(many=True, read_only=False, allow_empty=False)
+class JoureyDetailSerializer(JourneyListSerializer):
+    taken_places = TicketSeatsSerializer(source="tickets", many=True, read_only=True)
 
     class Meta:
-        model = Order
-        fields = ("id", "created_at", "tickets")
-
-    def create(self, validated_data):
-        with transaction.atomic():
-            tickets_data = validated_data.pop("tickets")
-            order = Order.objects.create(**validated_data)
-            for ticket_data in tickets_data:
-                Ticket.objects.create(order=order, **ticket_data)
-            return order
+        model = Journey
+        fields = JourneyListSerializer.Meta.fields + ("taken_places", )
 
 
 class OrderListSerializer(serializers.ModelSerializer):
