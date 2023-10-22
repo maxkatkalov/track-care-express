@@ -78,7 +78,7 @@ class TrainType(models.Model):
 
 def crew_image_file_path(instance, filename):
     _, extension = os.path.splitext(filename)
-    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+    filename = f"{slugify(instance.full_name)}-{uuid.uuid4()}{extension}"
 
     return os.path.join("uploads/crew/", filename)
 
@@ -88,6 +88,10 @@ class Crew(models.Model):
     last_name = models.CharField(max_length=100)
     staff_member_since = models.DateField(auto_now_add=True)
     profile_image = models.ImageField(null=True, upload_to=crew_image_file_path)
+
+    @property
+    def full_name(self) -> str:
+        return str(self)
 
     def __str__(self) -> str:
         return f"Crew member: {self.first_name} {self.last_name}"
