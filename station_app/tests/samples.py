@@ -1,9 +1,11 @@
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 
-from station_app.models import Station
+from station_app.models import Station, Route
 
 
 STATIONS_LIST_URL = reverse("station_app:stations-list")
+ROUTES_LIST_URL = reverse("station_app:routes-list")
 
 STATION_PAYLOAD = {
             "name": "Sample station",

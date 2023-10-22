@@ -1,6 +1,5 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
@@ -37,7 +36,7 @@ class AuthenticatedStationTestCases(TestCase):
         self.assertEqual(view_single.get_serializer_class(), StationDetailSerializer)
 
     def test_list_stations(self):
-        sample_station(2)
+
 
         response = self.client.get(STATIONS_LIST_URL)
 

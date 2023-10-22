@@ -159,3 +159,7 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=5000),
     "ROTATE_REFRESH_TOKENS": False,
 }
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
