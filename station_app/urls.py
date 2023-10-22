@@ -22,3 +22,5 @@ router.register("orders", OrderViewSet, basename="orders")
 router.register("tickets", TicketViewSet, basename="tickets")
 
 urlpatterns = router.urls
+
+app_name = "station_app"
