@@ -130,6 +130,16 @@ class OrderField(serializers.PrimaryKeyRelatedField):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+    journey = serializers.PrimaryKeyRelatedField(
+        queryset=Journey.objects.select_related(
+            "route",
+            "route__source",
+            "route__destination",
+            "train",
+            "train__train_type",
+        )
+    )
+
     class Meta:
         model = Ticket
         fields = ("id", "carriage", "seat", "journey")
@@ -169,15 +179,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class JourneySerializer(serializers.ModelSerializer):
     tickets_available = serializers.IntegerField(read_only=True)
-
-    def validate(self, attrs):
-        data = super().validate(attrs=attrs)
-        Journey.validate_journey_date_times_fields(
-            data["departure_time"],
-            data["arrival_time"],
-            serializers.ValidationError,
-        )
-        return data
+    route = serializers.PrimaryKeyRelatedField(queryset=Route.objects.select_related("source", "destination"))
+    train = serializers.PrimaryKeyRelatedField(queryset=Train.objects.select_related("train_type"))
 
     class Meta:
         model = Journey
@@ -190,6 +193,15 @@ class JourneySerializer(serializers.ModelSerializer):
             "crew",
             "tickets_available",
         )
+
+    def validate(self, attrs):
+        data = super().validate(attrs=attrs)
+        Journey.validate_journey_date_times_fields(
+            data["departure_time"],
+            data["arrival_time"],
+            serializers.ValidationError,
+        )
+        return data
 
 
 class JourneyListSerializer(JourneySerializer):

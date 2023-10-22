@@ -57,6 +57,11 @@ class RouteViewSet(ModelViewSet):
     serializer_class = RouteSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
+    def get_queryset(self):
+        if self.action in ("list", "retrieve"):
+            return self.queryset.select_related("source", "destination")
+        return self.queryset
+
 
 class CrewViewSet(ModelViewSet):
     queryset = Crew.objects.all()
@@ -93,6 +98,11 @@ class TrainViewSet(ModelViewSet):
     serializer_class = TrainSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
+    def get_queryset(self):
+        if self.action in ("list", "retrieve"):
+            return self.queryset.select_related("train_type")
+        return self.queryset
+
     def get_serializer_class(self):
         if self.action == "retrieve":
             return TrainDetailSerializer
@@ -109,7 +119,10 @@ class TrainTypeViewSet(ModelViewSet):
 
 
 class JourneyViewSet(ModelViewSet):
-    queryset = Journey.objects.annotate(
+    queryset = Journey.objects.select_related(
+        "route__source",
+        "route__destination",
+    ).prefetch_related("crew").annotate(
             tickets_available=(
                 F("train__carriage_num") * F("train__places_in_carriage")
                 - Count("tickets")
@@ -164,7 +177,7 @@ class JourneyViewSet(ModelViewSet):
 
 
 class OrderViewSet(ModelViewSet):
-    queryset = Order.objects.annotate(
+    queryset = Order.objects.prefetch_related("tickets").annotate(
         total_tickets=Count("tickets")
     )
     serializer_class = OrderSerializer
