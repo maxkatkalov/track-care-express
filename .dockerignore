@@ -1,0 +1,8 @@
+venv
+.github
+.gitignore
+.flake8
+README.md
+result.png
+.idea
+station_app/migrations
