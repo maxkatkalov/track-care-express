@@ -58,7 +58,7 @@ class StationViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "retrieve":
             return StationDetailSerializer
-        return StationSerializer
+        return self.serializer_class
 
 
 class RouteViewSet(viewsets.ModelViewSet):
@@ -121,7 +121,7 @@ class TrainViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             return TrainListSerializer
 
-        return TrainSerializer
+        return self.serializer_class
 
 
 class TrainTypeViewSet(viewsets.ModelViewSet):
@@ -175,7 +175,7 @@ class JourneyViewSet(viewsets.ModelViewSet):
             return JourneyListSerializer
         if self.action == "retrieve":
             return JoureyDetailSerializer
-        return JourneySerializer
+        return self.serializer_class
 
     @extend_schema(
         parameters=[
