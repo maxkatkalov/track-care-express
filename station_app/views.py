@@ -211,7 +211,7 @@ class OrderViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet,
 ):
-    queryset = Order.objects.prefetch_related("tickets").annotate(
+    queryset = Order.objects.prefetch_related("tickets").order_by("-created_at").annotate(
         total_tickets=Count("tickets")
     )
     serializer_class = OrderSerializer

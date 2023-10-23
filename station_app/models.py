@@ -14,6 +14,9 @@ class Station(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
 
+    class Meta:
+        ordering = ["name"]
+
     def __str__(self) -> str:
         return f"Station: {self.name}: {self.latitude}, {self.longitude}"
 
@@ -28,6 +31,9 @@ class Route(models.Model):
         related_name="destination_rout_station",
     )
     distance = models.FloatField()
+
+    class Meta:
+        ordering = ["distance"]
 
     @staticmethod
     def validate_route(
@@ -63,12 +69,18 @@ class Train(models.Model):
         "TrainType", on_delete=models.CASCADE, related_name="trains"
     )
 
+    class Meta:
+        ordering = ["train_type"]
+
     def __str__(self) -> str:
         return f"Train: {self.name}, type: {self.train_type}"
 
 
 class TrainType(models.Model):
     name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ["name"]
 
     def __str__(self) -> str:
         return self.name
@@ -89,6 +101,9 @@ class Crew(models.Model):
         null=True, upload_to=crew_image_file_path
     )
 
+    class Meta:
+        ordering = ["last_name", "first_name"]
+
     @property
     def full_name(self) -> str:
         return str(self)
@@ -107,6 +122,9 @@ class Journey(models.Model):
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
     crew = models.ManyToManyField(Crew, related_name="journeys")
+
+    class Meta:
+        ordering = ["-id"]
 
     @staticmethod
     def validate_journey_date_times_fields(
@@ -159,6 +177,9 @@ class Order(models.Model):
         related_name="orders",
     )
 
+    class Meta:
+        ordering = ["-created_at"]
+
     def __str__(self) -> str:
         return f"Order: {self.created_at}"
 
@@ -172,6 +193,10 @@ class Ticket(models.Model):
     journey = models.ForeignKey(
         Journey, on_delete=models.CASCADE, related_name="tickets"
     )
+
+    class Meta:
+        unique_together = ("journey", "carriage", "seat")
+        ordering = ["carriage", "seat"]
 
     @staticmethod
     def validate_ticket(carriage, seat, train, error_to_raise):
@@ -208,7 +233,3 @@ class Ticket(models.Model):
 
     def __str__(self) -> str:
         return f"Ticket: {self.order} - {self.journey}"
-
-    class Meta:
-        unique_together = ("journey", "carriage", "seat")
-        ordering = ["carriage", "seat"]
