@@ -18,7 +18,7 @@ URLS = {
         "register": reverse("station_user:create"),
         "login": reverse("station_user:token_obtain_pair"),
         "refresh_token": reverse("station_user:token_refresh"),
-    }
+    },
 }
 
 
@@ -29,7 +29,9 @@ class UnauthenticatedUserTest(TestCase):
     def test_auth_required(self):
         for url in URLS.get("station_app_urls"):
             response = self.client.get(url)
-            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+            self.assertEqual(
+                response.status_code, status.HTTP_401_UNAUTHORIZED
+            )
 
     def test_authenticated_can_register_and_login(self):
         data_new_user = {
@@ -41,22 +43,22 @@ class UnauthenticatedUserTest(TestCase):
             data_new_user,
         )
         response_login = self.client.post(
-            URLS.get("station_user_urls").get("login"),
-            data_new_user
+            URLS.get("station_user_urls").get("login"), data_new_user
         )
 
-        self.assertEqual(response_register.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(
+            response_register.status_code, status.HTTP_201_CREATED
+        )
         self.assertEqual(response_login.status_code, status.HTTP_200_OK)
 
 
 class AuthenticatedUserTest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user_data = {
-            "email": "a@b.com", "password": "test1234"
-        }
+        self.user_data = {"email": "a@b.com", "password": "test1234"}
         self.user = get_user_model().objects.create_user(
-            email=self.user_data.get("email"), password=self.user_data.get("password")
+            email=self.user_data.get("email"),
+            password=self.user_data.get("password"),
         )
         self.client.force_authenticate(user=self.user)
 
@@ -67,13 +69,12 @@ class AuthenticatedUserTest(TestCase):
 
     def test_authenticated_can_refresh_token(self):
         response_login = self.client.post(
-            URLS.get("station_user_urls").get("login"),
-            self.user_data
+            URLS.get("station_user_urls").get("login"), self.user_data
         )
         refresh_token = response_login.data.get("refresh")
         response_refresh = self.client.post(
             URLS.get("station_user_urls").get("refresh_token"),
-            {"refresh": refresh_token}
+            {"refresh": refresh_token},
         )
 
         self.assertEqual(response_login.status_code, status.HTTP_200_OK)

@@ -25,8 +25,12 @@ class AuthenticatedStationTestCases(TestCase):
         station1 = Station.objects.get(pk=1)
         station2 = Station.objects.get(pk=2)
 
-        Route.objects.create(source=station1, destination=station2, distance=100)
-        Route.objects.create(source=station2, destination=station1, distance=100)
+        Route.objects.create(
+            source=station1, destination=station2, distance=100
+        )
+        Route.objects.create(
+            source=station2, destination=station1, distance=100
+        )
 
         response = self.client.get(ROUTES_LIST_URL)
 

@@ -8,10 +8,10 @@ STATIONS_LIST_URL = reverse("station_app:stations-list")
 ROUTES_LIST_URL = reverse("station_app:routes-list")
 
 STATION_PAYLOAD = {
-            "name": "Sample station",
-            "latitude": 500,
-            "longitude": -500,
-        }
+    "name": "Sample station",
+    "latitude": 500,
+    "longitude": -500,
+}
 
 
 def sample_station(count: int = 1, **params):

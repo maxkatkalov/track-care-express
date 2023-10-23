@@ -120,27 +120,41 @@ class TrainTypeViewSet(ModelViewSet):
 
 
 class JourneyViewSet(ModelViewSet):
-    queryset = Journey.objects.select_related(
-        "route__source",
-        "route__destination",
-    ).prefetch_related("crew").annotate(
+    queryset = (
+        Journey.objects.select_related(
+            "route__source",
+            "route__destination",
+        )
+        .prefetch_related("crew")
+        .annotate(
             tickets_available=(
                 F("train__carriage_num") * F("train__places_in_carriage")
                 - Count("tickets")
             )
         )
+    )
     serializer_class = JourneySerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
         queryset = self.queryset
         if source_station := self.request.query_params.get("source"):
-            queryset = queryset.filter(route__source__name__icontains=source_station)
+            queryset = queryset.filter(
+                route__source__name__icontains=source_station
+            )
         if destination_station := self.request.query_params.get("destination"):
-            queryset = queryset.filter(route__destination__name__icontains=destination_station)
-        if source_station_departure_date := self.request.query_params.get("departure-date"):
-            source_station_departure_date = datetime.strptime(source_station_departure_date, "%Y-%m-%d").date()
-            queryset = queryset.filter(departure_time__date=source_station_departure_date)
+            queryset = queryset.filter(
+                route__destination__name__icontains=destination_station
+            )
+        if source_station_departure_date := self.request.query_params.get(
+            "departure-date"
+        ):
+            source_station_departure_date = datetime.strptime(
+                source_station_departure_date, "%Y-%m-%d"
+            ).date()
+            queryset = queryset.filter(
+                departure_time__date=source_station_departure_date
+            )
         return queryset
 
     def get_serializer_class(self):
@@ -161,14 +175,14 @@ class JourneyViewSet(ModelViewSet):
                 "destination",
                 type=OpenApiTypes.STR,
                 description=(
-                        "Filter by destination station name (ex. ?destination=Lviv)"
+                    "Filter by destination station name (ex. ?destination=Lviv)"
                 ),
             ),
             OpenApiParameter(
                 "departure-date",
                 type=OpenApiTypes.DATE,
                 description=(
-                        "Filter by departure-date (ex. ?departure-date=2023-10-21)"
+                    "Filter by departure-date (ex. ?departure-date=2023-10-21)"
                 ),
             ),
         ]

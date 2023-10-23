@@ -10,7 +10,7 @@ from .samples import (
     sample_station,
     station_detail_url,
     STATION_PAYLOAD,
-    STATIONS_LIST_URL
+    STATIONS_LIST_URL,
 )
 
 
@@ -33,11 +33,11 @@ class AuthenticatedStationTestCases(TestCase):
         view_single = response_single.renderer_context["view"]
 
         self.assertEqual(view_list.get_serializer_class(), StationSerializer)
-        self.assertEqual(view_single.get_serializer_class(), StationDetailSerializer)
+        self.assertEqual(
+            view_single.get_serializer_class(), StationDetailSerializer
+        )
 
     def test_list_stations(self):
-
-
         response = self.client.get(STATIONS_LIST_URL)
 
         stations = Station.objects.all()

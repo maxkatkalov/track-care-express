@@ -179,21 +179,23 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         with transaction.atomic():
-            instance.created_at = validated_data.get("created_at", instance.created_at)
+            instance.created_at = validated_data.get(
+                "created_at", instance.created_at
+            )
             instance.save()
 
             tickets_data = validated_data.get("tickets", [])
-            ticket_ids = [ticket.get('id') for ticket in tickets_data]
+            ticket_ids = [ticket.get("id") for ticket in tickets_data]
 
             tickets_to_delete = instance.tickets.exclude(id__in=ticket_ids)
             tickets_to_delete.delete()
 
             for ticket_data in tickets_data:
-                ticket_id = ticket_data.get('id')
+                ticket_id = ticket_data.get("id")
                 if ticket_id:
                     ticket = instance.tickets.filter(id=ticket_id).first()
                     if ticket:
-                        ticket.some_field = ticket_data.get('some_field')
+                        ticket.some_field = ticket_data.get("some_field")
                         ticket.save()
                 else:
                     Ticket.objects.create(order=instance, **ticket_data)
@@ -203,8 +205,12 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class JourneySerializer(serializers.ModelSerializer):
     tickets_available = serializers.IntegerField(read_only=True)
-    route = serializers.PrimaryKeyRelatedField(queryset=Route.objects.select_related("source", "destination"))
-    train = serializers.PrimaryKeyRelatedField(queryset=Train.objects.select_related("train_type"))
+    route = serializers.PrimaryKeyRelatedField(
+        queryset=Route.objects.select_related("source", "destination")
+    )
+    train = serializers.PrimaryKeyRelatedField(
+        queryset=Train.objects.select_related("train_type")
+    )
 
     class Meta:
         model = Journey
@@ -236,14 +242,10 @@ class JourneyListSerializer(JourneySerializer):
         source="train", view_name="trains-detail", read_only=True
     )
     source = serializers.SlugRelatedField(
-        source="route.source",
-        read_only=True,
-        slug_field="name"
+        source="route.source", read_only=True, slug_field="name"
     )
     destination = serializers.SlugRelatedField(
-        source="route.destination",
-        read_only=True,
-        slug_field="name"
+        source="route.destination", read_only=True, slug_field="name"
     )
 
     class Meta(JourneySerializer.Meta):
@@ -256,35 +258,32 @@ class JourneyListSerializer(JourneySerializer):
 
 
 class JoureyDetailSerializer(JourneyListSerializer):
-    taken_places = TicketSeatsSerializer(source="tickets", many=True, read_only=True)
+    taken_places = TicketSeatsSerializer(
+        source="tickets", many=True, read_only=True
+    )
 
     class Meta:
         model = Journey
-        fields = JourneyListSerializer.Meta.fields + ("taken_places", )
+        fields = JourneyListSerializer.Meta.fields + ("taken_places",)
 
 
 class OrderListSerializer(serializers.ModelSerializer):
     tickets = serializers.HyperlinkedRelatedField(
-        many=True,
-        view_name="tickets-detail",
-        read_only=True
+        many=True, view_name="tickets-detail", read_only=True
     )
     total_tickets = serializers.IntegerField()
 
     class Meta:
         model = Order
-        fields = OrderSerializer.Meta.fields + ("total_tickets", )
+        fields = OrderSerializer.Meta.fields + ("total_tickets",)
 
 
 class OrderDetailSerializer(OrderListSerializer):
     tickets = TicketSerializer(many=True, read_only=True)
     tickets_link = serializers.HyperlinkedRelatedField(
-        source="tickets",
-        many=True,
-        read_only=True,
-        view_name="tickets-detail"
+        source="tickets", many=True, read_only=True, view_name="tickets-detail"
     )
 
     class Meta:
         model = Order
-        fields = OrderListSerializer.Meta.fields + ("tickets_link", )
+        fields = OrderListSerializer.Meta.fields + ("tickets_link",)

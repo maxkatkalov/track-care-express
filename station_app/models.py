@@ -47,9 +47,7 @@ class Route(models.Model):
     def clean(self):
         Route.validate_route(self.source, self.destination, ValidationError)
 
-    def save(
-        self, *args, **kwargs
-    ):
+    def save(self, *args, **kwargs):
         self.full_clean()
         return super().save(*args, **kwargs)
 
@@ -87,7 +85,9 @@ class Crew(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     staff_member_since = models.DateField(auto_now_add=True)
-    profile_image = models.ImageField(null=True, upload_to=crew_image_file_path)
+    profile_image = models.ImageField(
+        null=True, upload_to=crew_image_file_path
+    )
 
     @property
     def full_name(self) -> str:
@@ -118,7 +118,8 @@ class Journey(models.Model):
             raise error_to_raise(
                 {
                     "source_datetime": [
-                        "source_datetime cannot be later than or equal to arrival_time"
+                        "source_datetime cannot be later than "
+                        "or equal to arrival_time"
                     ]
                 }
             )
@@ -126,7 +127,8 @@ class Journey(models.Model):
             raise error_to_raise(
                 {
                     "departure_time": [
-                        f"departure_time cannot be in the past it should be after {datetime.now().strftime('%Y-%m-%d, %H:%M')}"
+                        f"departure_time cannot be in the past it should be "
+                        f"after {datetime.now().strftime('%Y-%m-%d, %H:%M')}"
                     ]
                 }
             )
