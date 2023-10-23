@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import viewsets
 from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import action
@@ -42,10 +43,17 @@ from .serializers import (
 from .permissions import IsAdminOrIfAuthenticatedReadOnly
 
 
-class StationViewSet(ModelViewSet):
+class DefaultSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
+class StationViewSet(viewsets.ModelViewSet):
     queryset = Station.objects.all()
     serializer_class = StationSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    pagination_class = DefaultSetPagination
 
     def get_serializer_class(self):
         if self.action == "retrieve":
@@ -53,10 +61,11 @@ class StationViewSet(ModelViewSet):
         return StationSerializer
 
 
-class RouteViewSet(ModelViewSet):
+class RouteViewSet(viewsets.ModelViewSet):
     queryset = Route.objects.all()
     serializer_class = RouteSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    pagination_class = DefaultSetPagination
 
     def get_queryset(self):
         if self.action in ("list", "retrieve"):
@@ -64,10 +73,11 @@ class RouteViewSet(ModelViewSet):
         return self.queryset
 
 
-class CrewViewSet(ModelViewSet):
+class CrewViewSet(viewsets.ModelViewSet):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    pagination_class = DefaultSetPagination
 
     def get_serializer_class(self):
         if self.action == "upload_image":
@@ -94,10 +104,11 @@ class CrewViewSet(ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class TrainViewSet(ModelViewSet):
+class TrainViewSet(viewsets.ModelViewSet):
     queryset = Train.objects.all()
     serializer_class = TrainSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    pagination_class = DefaultSetPagination
 
     def get_queryset(self):
         if self.action in ("list", "retrieve"):
@@ -113,13 +124,14 @@ class TrainViewSet(ModelViewSet):
         return TrainSerializer
 
 
-class TrainTypeViewSet(ModelViewSet):
+class TrainTypeViewSet(viewsets.ModelViewSet):
     queryset = TrainType.objects.all()
     serializer_class = TrainTypeSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    pagination_class = DefaultSetPagination
 
 
-class JourneyViewSet(ModelViewSet):
+class JourneyViewSet(viewsets.ModelViewSet):
     queryset = (
         Journey.objects.select_related(
             "route__source",
@@ -135,6 +147,7 @@ class JourneyViewSet(ModelViewSet):
     )
     serializer_class = JourneySerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    pagination_class = DefaultSetPagination
 
     def get_queryset(self):
         queryset = self.queryset
@@ -196,13 +209,14 @@ class OrderViewSet(
     mixins.UpdateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
-    GenericViewSet,
+    viewsets.GenericViewSet,
 ):
     queryset = Order.objects.prefetch_related("tickets").annotate(
         total_tickets=Count("tickets")
     )
     serializer_class = OrderSerializer
     permission_classes = (IsAuthenticated,)
+    pagination_class = DefaultSetPagination
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
@@ -223,8 +237,9 @@ class TicketViewSet(
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     mixins.ListModelMixin,
-    GenericViewSet,
+    viewsets.GenericViewSet,
 ):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     permission_classes = (IsAuthenticated,)
+    pagination_class = DefaultSetPagination
