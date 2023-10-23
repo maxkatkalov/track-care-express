@@ -10,7 +10,7 @@ certifi==2023.7.22
 charset-normalizer==3.3.0
 click==8.1.7
 curtsies==0.4.2
-cwcwidth==0.1.9
+cwcwidth
 decorator==5.1.1
 Django==4.2.6
 django-debug-toolbar==4.2.0
@@ -39,12 +39,14 @@ pickleshare==0.7.5
 Pillow==10.1.0
 platformdirs==3.11.0
 prompt-toolkit==3.0.39
+psycopg2-binary
 ptyprocess==0.7.0
 pure-eval==0.2.2
 pycodestyle==2.11.1
 pyflakes==3.1.0
 Pygments==2.16.1
 PyJWT==2.8.0
+python-dotenv==1.0.0
 pytz==2023.3.post1
 pyxdg==0.28
 PyYAML==6.0.1

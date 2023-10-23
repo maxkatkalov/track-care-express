@@ -109,7 +109,9 @@ class TrainListSerializer(TrainSerializer):
 
 class TrainDetailSerializer(TrainListSerializer):
     train_type_link = serializers.HyperlinkedRelatedField(
-        source="train_type", view_name="station_app:trains-type-detail", read_only=True
+        source="train_type",
+        view_name="station_app:trains-type-detail",
+        read_only=True,
     )
 
     class Meta(TrainSerializer.Meta):
@@ -281,7 +283,10 @@ class OrderListSerializer(serializers.ModelSerializer):
 class OrderDetailSerializer(OrderListSerializer):
     tickets = TicketSerializer(many=True, read_only=True)
     tickets_link = serializers.HyperlinkedRelatedField(
-        source="tickets", many=True, read_only=True, view_name="station_app:tickets-detail"
+        source="tickets",
+        many=True,
+        read_only=True,
+        view_name="station_app:tickets-detail",
     )
 
     class Meta:
