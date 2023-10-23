@@ -109,7 +109,7 @@ class TrainListSerializer(TrainSerializer):
 
 class TrainDetailSerializer(TrainListSerializer):
     train_type_link = serializers.HyperlinkedRelatedField(
-        source="train_type", view_name="trains-type-detail", read_only=True
+        source="train_type", view_name="station_app:trains-type-detail", read_only=True
     )
 
     class Meta(TrainSerializer.Meta):
@@ -236,10 +236,10 @@ class JourneySerializer(serializers.ModelSerializer):
 
 class JourneyListSerializer(JourneySerializer):
     route_link = serializers.HyperlinkedRelatedField(
-        source="route", view_name="routes-detail", read_only=True
+        source="route", view_name="station_app:routes-detail", read_only=True
     )
     train_link = serializers.HyperlinkedRelatedField(
-        source="train", view_name="trains-detail", read_only=True
+        source="train", view_name="station_app:trains-detail", read_only=True
     )
     source = serializers.SlugRelatedField(
         source="route.source", read_only=True, slug_field="name"
@@ -269,7 +269,7 @@ class JoureyDetailSerializer(JourneyListSerializer):
 
 class OrderListSerializer(serializers.ModelSerializer):
     tickets = serializers.HyperlinkedRelatedField(
-        many=True, view_name="tickets-detail", read_only=True
+        many=True, view_name="station_app:tickets-detail", read_only=True
     )
     total_tickets = serializers.IntegerField()
 
@@ -281,7 +281,7 @@ class OrderListSerializer(serializers.ModelSerializer):
 class OrderDetailSerializer(OrderListSerializer):
     tickets = TicketSerializer(many=True, read_only=True)
     tickets_link = serializers.HyperlinkedRelatedField(
-        source="tickets", many=True, read_only=True, view_name="tickets-detail"
+        source="tickets", many=True, read_only=True, view_name="station_app:tickets-detail"
     )
 
     class Meta:
