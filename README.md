@@ -93,3 +93,5 @@ Then: ```python manage.py createsuperuser```
 - Authorised users can make List and Retrieve actions on all endpoints; Create, Update, List and Retrieve on Orders endpoint.
 
 - Admin can make all actions on every API endpoint besides Delete on Orders one.
+
+

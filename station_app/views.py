@@ -45,7 +45,7 @@ from .permissions import IsAdminOrIfAuthenticatedReadOnly
 
 class DefaultSetPagination(PageNumberPagination):
     page_size = 10
-    page_size_query_param = 'page_size'
+    page_size_query_param = "page_size"
     max_page_size = 1000
 
 
@@ -188,7 +188,8 @@ class JourneyViewSet(viewsets.ModelViewSet):
                 "destination",
                 type=OpenApiTypes.STR,
                 description=(
-                    "Filter by destination station name (ex. ?destination=Lviv)"
+                    "Filter by destination station name "
+                    "(ex. ?destination=Lviv)"
                 ),
             ),
             OpenApiParameter(
@@ -211,8 +212,10 @@ class OrderViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet,
 ):
-    queryset = Order.objects.prefetch_related("tickets").order_by("-created_at").annotate(
-        total_tickets=Count("tickets")
+    queryset = (
+        Order.objects.prefetch_related("tickets")
+        .order_by("-created_at")
+        .annotate(total_tickets=Count("tickets"))
     )
     serializer_class = OrderSerializer
     permission_classes = (IsAuthenticated,)
