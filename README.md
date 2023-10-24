@@ -23,9 +23,9 @@ These instructions will help you get a copy of the project up and running on you
 
 ### Online demo
 
-- You can access online project demo [here](https://care-express-api.techone.pp.ua/api/care-express/).
+- You can access the online project demo [here](https://care-express-api.techone.pp.ua/api/care-express/).
 
-- For [login](https://care-express-api.techone.pp.ua/api/station-user/token/login/) (admin with prepared orders data) you can use follow credits:
+- For [login](https://care-express-api.techone.pp.ua/api/station-user/token/login/) (admin with prepared order data), you can use the following credits:
 
    **Email:** admin@gmail.com
 
@@ -33,7 +33,7 @@ These instructions will help you get a copy of the project up and running on you
 
    Or you can [register](https://care-express-api.techone.pp.ua/api/station-user/register/) a new user.
 
-- For exploring the API endpoints access docs:
+- For exploring the API endpoints, access the documentation:
 
   - [Swagger](https://care-express-api.techone.pp.ua/api/doc/swagger/)
   - [Redoc](https://care-express-api.techone.pp.ua/api/doc/redoc/)
@@ -90,8 +90,8 @@ Then: ```python manage.py createsuperuser```
 
 - Unauthorised users can access only Api Root endpoint;
 
-- Authorised users can make List and Retrieve actions on all endpoints; Create, Update, List and Retrieve on Orders endpoint.
+- Authorised users can make List and Retrieve actions on all endpoints; Create, Update, List and Retrieve on the Order's endpoint.
 
-- Admin can make all actions on every API endpoint besides Delete on Orders one.
+- Admin can make all actions on every API endpoint besides Delete on Order's one.
 
 
