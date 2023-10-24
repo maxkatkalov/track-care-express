@@ -243,3 +243,6 @@ class TicketViewSet(
     serializer_class = TicketSerializer
     permission_classes = (IsAuthenticated,)
     pagination_class = DefaultSetPagination
+
+    def get_queryset(self):
+        return self.queryset.filter(order__user=self.request.user)
