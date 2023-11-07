@@ -1,0 +1,72 @@
+[
+    {
+        "model": "station_app.traintype",
+        "pk": 1,
+        "fields": {
+            "name": "High-Speed Rail (Shinkansen)"
+        }
+    },
+    {
+        "model": "station_app.traintype",
+        "pk": 2,
+        "fields": {
+            "name": "Regional Train"
+        }
+    },
+    {
+        "model": "station_app.traintype",
+        "pk": 3,
+        "fields": {
+            "name": "InterCity (IC) Train"
+        }
+    },
+    {
+        "model": "station_app.traintype",
+        "pk": 4,
+        "fields": {
+            "name": "Eurostar"
+        }
+    },
+    {
+        "model": "station_app.traintype",
+        "pk": 5,
+        "fields": {
+            "name": "Amtrak"
+        }
+    },
+    {
+        "model": "station_app.traintype",
+        "pk": 6,
+        "fields": {
+            "name": "Commute Train"
+        }
+    },
+    {
+        "model": "station_app.traintype",
+        "pk": 7,
+        "fields": {
+            "name": "Freight Train"
+        }
+    },
+    {
+        "model": "station_app.traintype",
+        "pk": 8,
+        "fields": {
+            "name": "Light Rail"
+        }
+    },
+    {
+        "model": "station_app.traintype",
+        "pk": 9,
+        "fields": {
+            "name": "Subway / Metro"
+        }
+    },
+    {
+        "model": "station_app.traintype",
+        "pk": 10,
+        "fields": {
+            "name": "Monorail"
+        }
+    }
+]
